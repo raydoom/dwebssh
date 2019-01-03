@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<ol class="breadcrumb">
+  <li>Admin</li>
+  <li class="active">Users</li>
+</ol>
+
+<div class="page-header">
+    <h2>
+        Users
+    </h2>
+</div>
+
+<table class="table table-hover">
+<caption>
+<form class="form-inline" style="float: right;" action="/users/" method="post">
+ {% csrf_token %}
+  <div class="form-group">
+    <p class="form-control-static">
+        <select class="form-control" name="filter_select">
+          <option {% if filter_select == "User Name =" or filter_select == "" %} selected="selected" {% endif %}>User Name =</option>
+          <option {% if filter_select == "Email" %} selected="selected" {% endif %}>Email</option>
+          <option {% if filter_select == "Superuser" %} selected="selected" {% endif %}>Superuser</option>
+          <option>Description</option>
+        </select>
+    </p>
+    <input type="text" class="form-control" name="filter_keyword" value="{{filter_keyword}}" placeholder="">
+  </div>
+  <button type="submit" class="btn btn-default"><span class="fa fa-filter"></span> Filter</button>
+  <button class="btn btn-default"><a class="fa fa-plus" href="/createuser/"> Create User</a></button>
+  <div class="btn-group">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    More Actions <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-right">
+    <li><a style="color: red;" href="#">Delete</a></li>
+    <li><a href="#">Other</a></li>
+  </ul>
+</div>
+</form>
+</caption>
+    <tr>
+        <td colspan="12" data-column="0">
+            <span class="table_count">Displaying 10 / {{ user_list_count }} items</span>
+        </td>
+    </tr>
+    <tr class="active">
+        <th><input type="checkbox" name="check_all" id="check_all" onclick="checkAll()"></th>
+        <th width="15%">User Name</th>
+        <th width="20%">Email</thw>
+        <th width="15%">Superuser</thw>
+        <th width="35%">Description</th>
+        <th width="15%">Action</th>
+    </tr>
+    {% for user in user_list %}
+    <tr>
+        <td><input type="checkbox" name="check_item"></td>
+        <td>{{user.username}}</td>
+        <td>{{user.email}}</td>
+        <td>{{user.is_superuser}}</td>
+        <td>{{user.description}}</td>
+        <td>
+ 
+          <!-- Split button -->
+          <div class="btn-group">
+            <a type="button" class="btn btn-default btn-sm" href="javascript:;" onclick="#">Edit</a>
+            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href="/changepassword/?username={{user.username}}">Change Password</a></li>
+              <li><a style="color: red;" href="/deleteuser/?username={{user.username}}">Delete User</a></li>
+            </ul>
+          </div>
+        </td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="12" data-column="0">
+            <span class="table_count">Displaying 10 / {{ user_list_count }} items</span>
+        </td>
+    </tr>
+</table>
+
+<div>
+  <span style="text-align:center; display:block;">
+    <a>
+        {% if user_list.has_previous %}
+            <a style="text-decoration:underline; color:inherit;" href="{{ page_prefix }}{{ user_list.previous_page_number }}">Previous</a>
+        {% endif %}
+    </a>
+    <a style="color:inherit;">&nbsp; < {{ user_list.number }} / {{ user_list.paginator.num_pages }} > &nbsp;</a>
+    <a>
+        {% if user_list.has_next %}
+            <a style="text-decoration:underline; color:inherit;" href="{{ page_prefix }}{{ user_list.next_page_number }}">Next</a>
+        {% endif %}
+    </a>
+  </span>
+</div>
+
+<script> 
+//复选框的全选、取消全选功能
+function checkAll() {
+var all=document.getElementById('check_all');//获取到点击全选的那个复选框的id
+var one=document.getElementsByName('check_item');//获取到复选框的名称
+//因为获得的是数组，所以要循环 为每一个checked赋值
+for(var i=0;i<one.length;i++){
+one[i].checked=all.checked; //直接赋值不就行了嘛
+}
+}
+</script>
+
+{% endblock %}

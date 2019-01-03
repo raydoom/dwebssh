@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<ol class="breadcrumb">
+  <li>Server</li>
+  <li class="active">Server List</li>
+</ol>
+
+<div class="page-header">
+    <h2>
+        Server List
+    </h2>
+</div>
+
+<table class="table table-hover">
+<caption>
+<form class="form-inline" style="float: right;" action="/serverlist/" method="post">
+ {% csrf_token %}
+  <div class="form-group">
+    <p class="form-control-static">
+        <select class="form-control" name="filter_select">
+          <option {% if filter_select == "Host Name" or filter_select == "" %} selected="selected" {% endif %}>Host Name</option>
+          <option {% if filter_select == "IP" %} selected="selected" {% endif %}>IP</option>
+          <option {% if filter_select == "Port =" %} selected="selected" {% endif %}>Port =</option>
+          <option {% if filter_select == "Description" %} selected="selected" {% endif %}>Description</option>
+        </select>
+    </p>
+    <input type="text" class="form-control" name="filter_keyword" value="{{filter_keyword}}" placeholder="">
+  </div>
+  <button type="submit" class="btn btn-default"><span class="fa fa-filter"></span> Filter</button>
+  {% if request.session.is_superuser == True %}
+  <button class="btn btn-default"><a class="fa fa-plus" href="/addserver/"> Add Server</a></button>
+  <div class="btn-group">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    More Actions <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-right">
+    <li><a href="#">Edit</a></li>
+    <li><a style="color: red;" href="#">Delete</a></li>
+  </ul>
+  </div>
+  {% endif %}
+</form>
+</caption>
+    <tr>
+        <td colspan="12" data-column="0">
+            <span class="table_count">Displaying 10 /  {{ server_count }} items</span>
+        </td>
+    </tr>
+    <tr class="active">
+        <th><input type="checkbox" name="check_all" id="check_all" onclick="checkAll()"></th>
+        <th width="15%">Host Name</th>
+        <th width="15%">IP</thw>
+        <th width="10%">Port</th>
+        <th width="45%">Description</th>
+        <th colspan="4" width="15%">Actions</th>
+    </tr>
+    {% for server in server_list %}
+    <tr>
+        <td><input type="checkbox" name="check_item"></td>
+        <td>{{server.hostname}}</td>
+        <td>{{server.ip}}</td>
+        <td>{{server.port}}</td>
+        <td>{{server.description}}</td>
+        <td>
+          
+          <!-- Split button -->
+          <div class="btn-group">
+            <a type="button" class="btn btn-default btn-sm" href="/webshell/?ip={{server.ip}}" target="_blank">Web Shell</a>
+            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href="/editserver/?ip={{server.ip}}" target="_blank">Web Sftp</a></li>
+              {% if request.session.is_superuser == True %}
+              <li><a href="/editserver/?ip={{server.ip}}" target="_blank">Edit Server</a></li>
+              <li><a style="color: red;" href="/deleteserver/?ip={{server.ip}}">Delete Server</a></li>
+              {% endif %}
+            </ul>
+          </div>
+
+        </td>
+
+    </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="12" data-column="0">
+            <span class="table_count">Displaying 10 / {{ server_count }} items</span>
+        </td>
+    </tr>
+
+</table>
+
+
+<div>
+  <span style="text-align:center; display:block;">
+    <a>
+        {% if server_list.has_previous %}
+            <a style="text-decoration:underline; color:inherit;" href="{{ page_prefix }}{{ server_list.previous_page_number }}">Previous</a>
+        {% endif %}
+    </a>
+    <a style="color:inherit;">&nbsp; < {{ server_list.number }} / {{ server_list.paginator.num_pages }} > &nbsp;</a>
+    <a>
+        {% if server_list.has_next %}
+            <a style="text-decoration:underline; color:inherit;" href="{{ page_prefix }}{{ server_list.next_page_number }}">Next</a>
+        {% endif %}
+    </a>
+  </span>
+</div>
+
+<script> 
+//复选框的全选、取消全选功能
+function checkAll() {
+var all=document.getElementById('check_all');//获取到点击全选的那个复选框的id
+var one=document.getElementsByName('check_item');//获取到复选框的名称
+//因为获得的是数组，所以要循环 为每一个checked赋值
+for(var i=0;i<one.length;i++){
+one[i].checked=all.checked; //直接赋值不就行了嘛
+}
+}
+</script>
+
+{% endblock %}
+

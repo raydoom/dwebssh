@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<ol class="breadcrumb">
+  <li>Server</li>
+  <li class="active">Web Shell</li>
+</ol>
+
+<div class="page-header">
+  <h2>Web Shell</h2>
+</div>
+
+<script>
+  var schema = window.location.protocol=='https:' ? 'wss:' : 'ws:';
+  var wsurl=schema+"//"+window.location.host+window.location.pathname+window.location.search
+  var socket = new WebSocket(wsurl);
+
+  socket.onopen = function () {
+    var term = new Terminal();
+    term.open(document.getElementById('terms'));
+    term.on('data', function (data) {
+      socket.send(data);
+    });
+
+    socket.onmessage = function (msg) {
+      term.write(msg.data);
+    };
+    socket.onerror = function (e) {
+      console.log(e);
+    };
+    socket.onclose = function (e) {
+      console.log(e);
+      term.destroy();
+    };
+  };
+
+</script>
+
+<h5>{{server.username}}@{{server.ip}}:{{server.port}}</h5>
+
+<div id='terms'>
+
+</div>
+
+{% endblock %}
