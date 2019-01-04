@@ -1,7 +1,7 @@
 from django.views.generic.base import RedirectView
 from django.contrib import admin
 from django.urls import path
-from app.views import Server_List, web_shell, Login, Sign_Out, Add_Server, Change_Password, Account, Users, Create_User, Delete_User
+from app.views import Server_List, web_shell, Login, Sign_Out, Add_Server, Change_Password, Account, Users, Create_User, Delete_User, Delete_Server, Edit_Server
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -9,6 +9,8 @@ urlpatterns = [
 
     path(r'serverlist/', Server_List.as_view(), name='server_list'),
     path(r'addserver/', Add_Server.as_view(), name='add_server'),
+    path(r'deleteserver/', Delete_Server.as_view(), name='delete_server'),
+    path(r'editserver/', Edit_Server.as_view(), name='edit_server'),
     path(r'webshell/', web_shell, name='web_shell'),
 
  	path(r'login/', Login.as_view(), name='login'),

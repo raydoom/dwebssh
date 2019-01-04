@@ -75,6 +75,46 @@ class Add_Server(View):
 			logging.error(e)
 		return redirect('/serverlist/')
 
+# 删除服务器
+@method_decorator(auth_controller, name='dispatch')
+class Delete_Server(View):
+	def get(self, request):
+		ip = request.GET.get('ip')
+		try:
+			Server.objects.filter(ip=ip).delete()
+		except Exception as e:
+			logging.error(e)
+		return redirect('/serverlist/')
+
+# 编辑服务器
+@method_decorator(auth_controller, name='dispatch')
+class Edit_Server(View):
+	def get(self, request):
+		ip = request.GET.get('ip')
+		server = Server.objects.get(ip=ip)
+		return render(request, 'edit_server.html', {'server': server})
+
+	def post(self, request):
+		hostname = request.POST.get('hostname')
+		ip = request.POST.get('ip')
+		port = request.POST.get('port')
+		username = request.POST.get('username')
+		password = request.POST.get('password')
+		description = request.POST.get('description')
+		try:
+			obj = Server.objects.get(ip=ip)
+			obj.hostname=hostname
+			obj.ip=ip
+			obj.port=int(port)
+			obj.username=username
+			obj.description = description
+			if password != '':
+				obj.password = password
+			obj.save()
+		except Exception as e:
+			logging.error(e)
+		return redirect('/serverlist/')
+
 # web shell功能
 @auth_controller
 @accept_websocket
@@ -235,3 +275,4 @@ class Delete_User(View):
 		username = request.GET.get('username')
 		User_Info.objects.filter(username=username).delete()
 		return redirect('/users/')
+
